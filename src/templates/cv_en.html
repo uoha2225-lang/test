@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{personal.name}} - CV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #333;
+            background-color: #fff;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .contact-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        .contact-info span {
+            margin: 0 10px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 18px;
+            color: #2c3e50;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .item {
+            margin-bottom: 15px;
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .item-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+        }
+        .item-subtitle {
+            font-weight: 600;
+            font-style: italic;
+            color: #555;
+            margin-top: 2px;
+        }
+        .item-meta {
+            font-size: 13px;
+            color: #777;
+        }
+        .item-desc {
+            margin-top: 5px;
+            color: #444;
+        }
+        .list-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tag {
+            background-color: #f4f6f7;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            border: 1px solid #e1e5e8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>{{personal.name}}</h1>
+        <div class="contact-info">
+            <span>{{personal.phone}}</span>|
+            <span>{{personal.email}}</span>
+            {{#if personal.city}}
+            | <span>{{personal.city}}</span>
+            {{/if}}
+        </div>
+    </div>
+
+    {{#if experience.length}}
+    <div class="section">
+        <div class="section-title">Professional Experience</div>
+        {{#each experience}}
+        <div class="item">
+            <div class="item-header">
+                <div class="item-title">{{title}}</div>
+                <div class="item-meta">{{duration}}</div>
+            </div>
+            <div class="item-subtitle">{{company}}</div>
+            {{#if description}}
+            <div class="item-desc">{{description}}</div>
+            {{/if}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if education.length}}
+    <div class="section">
+        <div class="section-title">Education</div>
+        {{#each education}}
+        <div class="item">
+            <div class="item-header">
+                <div class="item-title">{{degree}} - {{major}}</div>
+            </div>
+            <div class="item-subtitle">{{institution}}</div>
+            <div class="item-desc">
+                GPA: {{gpa}}
+                {{#if cert}}<br>Certification: {{cert}}{{/if}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if courses.length}}
+    <div class="section">
+        <div class="section-title">Courses & Certifications</div>
+        {{#each courses}}
+        <div class="item">
+            <div class="item-header">
+                <div class="item-title">{{name}}</div>
+                <div class="item-meta">{{year}}</div>
+            </div>
+            <div class="item-subtitle">{{institution}}</div>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if skills.length}}
+    <div class="section">
+        <div class="section-title">Skills</div>
+        <div class="list-inline">
+            {{#each skills}}
+            <div class="tag">{{this}}</div>
+            {{/each}}
+        </div>
+    </div>
+    {{/if}}
+
+    {{#if languages.length}}
+    <div class="section">
+        <div class="section-title">Languages</div>
+        <div class="list-inline">
+            {{#each languages}}
+            <div class="tag">{{this}}</div>
+            {{/each}}
+        </div>
+    </div>
+    {{/if}}
+
+</body>
+</html>

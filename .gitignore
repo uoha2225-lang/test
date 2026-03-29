@@ -1,0 +1,16 @@
+# Node modules (You don't upload this, Render will install it automatically)
+node_modules/
+
+# Environment Variables (Contains your secret token, KEEP THIS SECRET)
+.env
+
+# Local Database (You don't upload local test users, Render will make a new DB)
+database.sqlite
+*.db
+
+# PDF test outputs (No need to upload old test CVs)
+pdf_output/
+*.pdf
+
+# Mac System Files (Useless garbage files on Mac)
+.DS_Store
