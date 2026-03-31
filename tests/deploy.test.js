@@ -11,9 +11,11 @@ test('render blueprint contains worker setup and required env vars', () => {
     assert.match(content, /type:\s*worker/);
     assert.match(content, /env:\s*node/);
     assert.match(content, /autoDeploy:\s*true/);
+    assert.match(content, /buildCommand:\s*PUPPETEER_CACHE_DIR=.*npm ci && PUPPETEER_CACHE_DIR=.*puppeteer browsers install chrome/);
     assert.match(content, /key:\s*BOT_TOKEN/);
     assert.match(content, /key:\s*DB_PATH/);
     assert.match(content, /key:\s*PDF_OUTPUT_DIR/);
+    assert.match(content, /key:\s*PUPPETEER_CACHE_DIR/);
     assert.doesNotMatch(content, /dockerfilePath/);
 });
 

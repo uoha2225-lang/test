@@ -1,7 +1,12 @@
 const { Scenes, Markup } = require('telegraf');
 const { logAction, getUser } = require('../db');
 const { generatePDF } = require('../utils/pdfGenerator');
-const { generateCvPdfForUser, mapGenerationError, toUserErrorMessage } = require('../services/cvService');
+const {
+    generateCvPdfForUser,
+    mapGenerationError,
+    toUserErrorMessage,
+    validateCvGenerationRequest
+} = require('../services/cvService');
 const fs = require('fs');
 const path = require('path');
 
@@ -326,9 +331,15 @@ const stepGenerate = async (ctx) => {
     }
     if (ctx.callbackQuery && ctx.callbackQuery.data === 'GENERATE_PDF') {
         await ctx.answerCbQuery();
-        await ctx.reply(isAr(ctx) ? '⏳ جاري إنشاء ملف PDF... (قد يستغرق 10 ثواني)' : '⏳ Generating PDF... (May take 10 seconds)');
         try {
             const user = await getUser(ctx.from.id);
+            validateCvGenerationRequest({
+                cvData: ctx.session.cvData,
+                user
+            });
+
+            await ctx.reply(isAr(ctx) ? '⏳ جاري إنشاء ملف PDF... (قد يستغرق 10 ثواني)' : '⏳ Generating PDF... (May take 10 seconds)');
+
             const { pdfPath, fileName } = await generateCvPdfForUser({
                 cvData: ctx.session.cvData,
                 user,
@@ -345,7 +356,7 @@ const stepGenerate = async (ctx) => {
         } catch (err) {
             console.error(err);
             const errorCode = mapGenerationError(err);
-            await ctx.reply(`❌ ${toUserErrorMessage(errorCode, isAr(ctx))}`);
+            await ctx.reply(`❌ ${toUserErrorMessage(errorCode, isAr(ctx), err)}`);
         }
         return ctx.scene.leave();
     }
