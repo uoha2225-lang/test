@@ -21,11 +21,19 @@ async function generatePDF(cvData, userId) {
     const template = Handlebars.compile(htmlContent);
     const finalHtml = template(cvData);
     
-    // Launch Puppeteer
+    // Launch Puppeteer with maximum compatibility for shared hosts
     const browser = await puppeteer.launch({
         headless: "new",
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: [
+            '--no-sandbox', 
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process'
+        ]
     });
     
     const page = await browser.newPage();
