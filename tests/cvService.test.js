@@ -65,14 +65,17 @@ test('validateCvGenerationRequest returns normalized cv data for valid input', (
     assert.deepEqual(normalized.languages, ['Arabic', 'English']);
 });
 
-test('mapGenerationError detects browser dependency errors', () => {
-    const code = mapGenerationError(new Error('Could not find Chrome (ver. 125)'));
-    assert.equal(code, 'BROWSER_NOT_FOUND');
+test('mapGenerationError detects direct PDF generation errors', () => {
+    assert.equal(mapGenerationError(new Error('font missing on disk')), 'PDF_FONT_MISSING');
+    assert.equal(mapGenerationError(new Error('layout rendering failed')), 'PDF_LAYOUT_FAILED');
+    assert.equal(mapGenerationError(new Error('pdf write failed')), 'PDF_GENERATION_FAILED');
 });
 
 test('toUserErrorMessage returns arabic and english content', () => {
     assert.match(toUserErrorMessage('USER_NOT_SUBSCRIBED', true), /الاشتراك/);
     assert.match(toUserErrorMessage('USER_NOT_SUBSCRIBED', false), /Subscription/);
+    assert.match(toUserErrorMessage('PDF_FONT_MISSING', true), /إعدادات إنشاء ملف PDF/);
+    assert.match(toUserErrorMessage('PDF_LAYOUT_FAILED', false), /laid out in a PDF/);
 });
 
 test('toUserErrorMessage includes localized validation details', () => {

@@ -3,7 +3,7 @@ services:
     name: bot-telegram
     env: node
     plan: starter
-    buildCommand: PUPPETEER_CACHE_DIR=.puppeteer-cache npm ci && PUPPETEER_CACHE_DIR=.puppeteer-cache npx puppeteer browsers install chrome
+    buildCommand: npm ci
     startCommand: npm run start:render
     autoDeploy: true
     disk:
@@ -19,7 +19,5 @@ services:
         value: /var/data/database.sqlite
       - key: PDF_OUTPUT_DIR
         value: /var/data/pdf_output
-      - key: PUPPETEER_CACHE_DIR
-        value: .puppeteer-cache
       - key: NODE_ENV
         value: production

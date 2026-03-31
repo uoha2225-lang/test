@@ -215,11 +215,12 @@ function toUserErrorMessage(errorCode, ar, error) {
             ? 'بيانات السيرة الذاتية غير مكتملة أو غير صالحة. أعد مراجعة المعلومات ثم حاول مرة أخرى.'
             : 'CV data is incomplete or invalid. Please review the information and try again.';
     }
-    if (errorCode === 'BROWSER_NOT_FOUND') return ar ? 'خدمة إنشاء PDF غير متاحة حالياً على الخادم. تواصل مع الدعم الفني.' : 'PDF generation service is unavailable on this server right now.';
-    if (errorCode === 'PDF_BROWSER_LAUNCH_FAILED') return ar ? 'تعذر تشغيل خدمة إنشاء PDF على الخادم حالياً. حاول لاحقاً أو تواصل مع الدعم الفني.' : 'The PDF service could not start on the server right now. Please try again later or contact support.';
-    if (errorCode === 'PDF_TEMPLATE_NOT_FOUND' || errorCode === 'PDF_GENERATOR_NOT_AVAILABLE') return ar ? 'إعدادات إنشاء السيرة الذاتية غير مكتملة على الخادم. تواصل مع الدعم الفني.' : 'The CV PDF service is not configured correctly on the server. Please contact support.';
-    if (errorCode === 'PDF_TEMPLATE_RENDER_FAILED' || errorCode === 'PDF_GENERATION_FAILED') return ar ? 'تعذر معالجة بيانات السيرة الذاتية لإنشاء ملف PDF. راجع البيانات ثم حاول مرة أخرى.' : 'The CV data could not be processed into a PDF. Please review the data and try again.';
+    if (errorCode === 'PDF_FONT_MISSING' || errorCode === 'PDF_GENERATOR_NOT_AVAILABLE') return ar ? 'إعدادات إنشاء ملف PDF غير مكتملة على الخادم. تواصل مع الدعم الفني.' : 'The PDF service is missing required resources on the server. Please contact support.';
+    if (errorCode === 'PDF_LAYOUT_FAILED' || errorCode === 'PDF_GENERATION_FAILED') return ar ? 'تعذر تنسيق السيرة الذاتية داخل ملف PDF. راجع البيانات ثم حاول مرة أخرى.' : 'The CV could not be laid out in a PDF. Please review the data and try again.';
     if (errorCode === 'PDF_OUTPUT_DIR_ERROR' || errorCode === 'PDF_FILE_NOT_CREATED' || errorCode === 'PDF_FILE_EMPTY') return ar ? 'تمت معالجة السيرة الذاتية لكن تعذر إنشاء ملف PDF صالح. حاول مرة أخرى لاحقاً.' : 'The CV was processed but a valid PDF file could not be created. Please try again later.';
+    if (errorCode === 'BROWSER_NOT_FOUND' || errorCode === 'PDF_BROWSER_LAUNCH_FAILED' || errorCode === 'PDF_TEMPLATE_NOT_FOUND' || errorCode === 'PDF_TEMPLATE_RENDER_FAILED') {
+        return ar ? 'خدمة إنشاء ملف PDF غير متاحة حالياً على الخادم. تواصل مع الدعم الفني.' : 'The PDF generation service is unavailable on this server right now.';
+    }
     return ar ? 'حدث خطأ أثناء إنشاء السيرة الذاتية.' : 'Error generating PDF.';
 }
 
@@ -227,11 +228,12 @@ function mapGenerationError(error) {
     if (error && error.code) return error.code;
     if (!error || !error.message) return 'UNKNOWN';
     const message = error.message.toLowerCase();
+    if (message.includes('font')) return 'PDF_FONT_MISSING';
+    if (message.includes('layout')) return 'PDF_LAYOUT_FAILED';
+    if (message.includes('pdf')) return 'PDF_GENERATION_FAILED';
     if (message.includes('could not find chrome') || message.includes('failed to launch the browser process') || message.includes('browser was not found')) {
         return 'BROWSER_NOT_FOUND';
     }
-    if (message.includes('template')) return 'PDF_TEMPLATE_RENDER_FAILED';
-    if (message.includes('pdf')) return 'PDF_GENERATION_FAILED';
     return 'UNKNOWN';
 }
 
