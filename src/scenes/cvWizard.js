@@ -1,6 +1,7 @@
 const { Scenes, Markup } = require('telegraf');
-const { logAction } = require('../db');
+const { logAction, getUser } = require('../db');
 const { generatePDF } = require('../utils/pdfGenerator');
+const { generateCvPdfForUser, mapGenerationError, toUserErrorMessage } = require('../services/cvService');
 const fs = require('fs');
 const path = require('path');
 
@@ -319,24 +320,32 @@ const stepLanguages = async (ctx) => {
 
 const stepGenerate = async (ctx) => {
     if (ctx.callbackQuery && ctx.callbackQuery.data === 'CANCEL_CV') {
+        await ctx.answerCbQuery();
         ctx.reply(isAr(ctx) ? 'تم الغاء العملية.' : 'Canceled.');
         return ctx.scene.leave();
     }
     if (ctx.callbackQuery && ctx.callbackQuery.data === 'GENERATE_PDF') {
+        await ctx.answerCbQuery();
         await ctx.reply(isAr(ctx) ? '⏳ جاري إنشاء ملف PDF... (قد يستغرق 10 ثواني)' : '⏳ Generating PDF... (May take 10 seconds)');
         try {
-            const pdfPath = await generatePDF(ctx.session.cvData, ctx.from.id);
-            await ctx.replyWithDocument({ source: pdfPath, filename: `Resume_${ctx.session.cvData.personal.name.replace(/\s/g,'_')}.pdf` });
+            const user = await getUser(ctx.from.id);
+            const { pdfPath, fileName } = await generateCvPdfForUser({
+                cvData: ctx.session.cvData,
+                user,
+                userId: ctx.from.id,
+                generatePDF
+            });
+            await ctx.replyWithDocument({ source: pdfPath, filename: fileName });
             await logAction(ctx.from.id, 'CV_GENERATED', 'Generated CV successfully.');
             
-            // Delete temp generated file
             setTimeout(() => {
                 if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
             }, 60000);
             
         } catch (err) {
             console.error(err);
-            await ctx.reply(isAr(ctx) ? '❌ حدث خطأ أثناء إنشاء السيرة الذاتية.' : '❌ Error generating PDF.');
+            const errorCode = mapGenerationError(err);
+            await ctx.reply(`❌ ${toUserErrorMessage(errorCode, isAr(ctx))}`);
         }
         return ctx.scene.leave();
     }
