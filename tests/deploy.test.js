@@ -9,9 +9,12 @@ test('render blueprint contains worker setup and required env vars', () => {
     const content = fs.readFileSync(renderPath, 'utf8');
 
     assert.match(content, /type:\s*worker/);
+    assert.match(content, /env:\s*node/);
     assert.match(content, /autoDeploy:\s*true/);
     assert.match(content, /key:\s*BOT_TOKEN/);
     assert.match(content, /key:\s*DB_PATH/);
+    assert.match(content, /key:\s*PDF_OUTPUT_DIR/);
+    assert.doesNotMatch(content, /dockerfilePath/);
 });
 
 test('database initialization creates required tables', async () => {

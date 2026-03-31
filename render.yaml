@@ -1,9 +1,9 @@
 services:
   - type: worker
     name: bot-telegram
-    env: docker
+    env: node
     plan: starter
-    dockerfilePath: ./Dockerfile
+    buildCommand: npm ci
     startCommand: npm run start:render
     autoDeploy: true
     disk:
@@ -17,5 +17,7 @@ services:
         value: CvSupport1
       - key: DB_PATH
         value: /var/data/database.sqlite
+      - key: PDF_OUTPUT_DIR
+        value: /var/data/pdf_output
       - key: NODE_ENV
         value: production

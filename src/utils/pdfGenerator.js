@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Ensure output dir exists
-const outputDir = path.join(__dirname, '../../pdf_output');
+const outputDir = process.env.PDF_OUTPUT_DIR || path.join(__dirname, '../../pdf_output');
 if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
 }
