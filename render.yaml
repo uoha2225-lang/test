@@ -1,0 +1,21 @@
+services:
+  - type: worker
+    name: bot-telegram
+    env: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    startCommand: npm run start:render
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: SUPPORT_USERNAME
+        value: CvSupport1
+      - key: DB_PATH
+        value: /var/data/database.sqlite
+      - key: NODE_ENV
+        value: production

@@ -6,6 +6,7 @@ const { initDB, getUser, createUser } = require('./db');
 const paymentScene = require('./scenes/payment');
 const adminScene = require('./scenes/admin');
 const cvWizard = require('./scenes/cvWizard');
+const SUPPORT_USERNAME = process.env.SUPPORT_USERNAME || 'CvSupport1';
 
 if (!process.env.BOT_TOKEN || process.env.BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') {
     console.warn('⚠️ WARNING: BOT_TOKEN is missing or not set in .env file!');
@@ -48,11 +49,11 @@ bot.start(async (ctx) => {
 
     if (user && !user.is_subscribed && !user.is_admin) {
         // Non-subscribed user -> Payment flow
-        return ctx.reply('أهلاً بك في بوت إنشاء السيرة الذاتية (CV).\n\nسعر إنشاء السيرة هو 9.99 ريال فقط.\nيرجى الاشتراك للبدء.', {
+        return ctx.reply(`أهلاً بك في بوت إنشاء السيرة الذاتية (CV).\n\nسعر إنشاء السيرة هو 9.99 ريال فقط.\nيرجى الاشتراك للبدء.\n\nلإكمال تفعيل الحساب بعد الدفع تواصل مع @${SUPPORT_USERNAME}.`, {
             reply_markup: {
                 inline_keyboard: [
                     [{ text: '💳 ادفع للاشتراك', callback_data: 'PAYMENT_START' }],
-                    [{ text: '🔑 فعل نفسك كـ أدمن', callback_data: 'ACTIVATE_ADMIN_BTN' }]
+                    [{ text: '✅ تفعيل الحساب عبر الدعم', callback_data: 'ACTIVATE_ADMIN_BTN' }]
                 ]
             }
         });
@@ -62,10 +63,10 @@ bot.start(async (ctx) => {
     let inline_keyboard = [
         [{ text: '🇸🇦 سيرة ذاتية عربي', callback_data: 'START_CV_AR' }],
         [{ text: '🇬🇧 Resume English', callback_data: 'START_CV_EN' }],
-        [{ text: '📞 الدعم الفني', url: 'https://t.me/BenDakhiL' }]
+        [{ text: '📞 الدعم الفني', url: `https://t.me/${SUPPORT_USERNAME}` }]
     ];
     if (user && !user.is_admin) {
-        inline_keyboard.push([{ text: '🔑 فعل نفسك كـ أدمن', callback_data: 'ACTIVATE_ADMIN_BTN' }]);
+        inline_keyboard.push([{ text: '✅ تفعيل الحساب عبر الدعم', callback_data: 'ACTIVATE_ADMIN_BTN' }]);
     }
     
     ctx.reply('أهلاً 👋\\nجهّز سيرتك الذاتية خلال دقيقتين فقط!', {
@@ -76,7 +77,7 @@ bot.start(async (ctx) => {
 bot.action('PAYMENT_START', (ctx) => ctx.scene.enter('paymentScene'));
 
 bot.action('ACTIVATE_ADMIN_BTN', (ctx) => {
-    ctx.reply('الرجاء إرسال كود التفعيل الخاص بالآدمن الآن بكتابته في الدردشة:');
+    ctx.reply(`لتفعيل الحساب، تواصل مباشرة مع الدعم عبر الحساب التالي:\n@${SUPPORT_USERNAME}\n\nأرسل صورة الحوالة ومعرفك الشخصي (ID) ليتم التفعيل بسرعة.`);
     ctx.answerCbQuery();
 });
 
@@ -93,10 +94,10 @@ bot.hears(['ابدا الاستخدام', '/start'], async (ctx) => {
          let inline_keyboard = [
              [{ text: '🇸🇦 سيرة ذاتية عربي', callback_data: 'START_CV_AR' }],
              [{ text: '🇬🇧 Resume English', callback_data: 'START_CV_EN' }],
-             [{ text: '📞 الدعم الفني', url: 'https://t.me/BenDakhiL' }]
+             [{ text: '📞 الدعم الفني', url: `https://t.me/${SUPPORT_USERNAME}` }]
          ];
          if (!user.is_admin) {
-             inline_keyboard.push([{ text: '🔑 فعل نفسك كـ أدمن', callback_data: 'ACTIVATE_ADMIN_BTN' }]);
+             inline_keyboard.push([{ text: '✅ تفعيل الحساب عبر الدعم', callback_data: 'ACTIVATE_ADMIN_BTN' }]);
          }
          ctx.reply('أهلاً 👋\\nجهّز سيرتك الذاتية خلال دقيقتين فقط!', {
             reply_markup: { inline_keyboard }
@@ -136,10 +137,11 @@ async function startBot() {
     console.log('Database initialized.');
     
     if (process.env.BOT_TOKEN && process.env.BOT_TOKEN !== 'YOUR_BOT_TOKEN_HERE') {
-        bot.launch();
+        await bot.launch({ dropPendingUpdates: true });
         console.log('Telegram Bot is successfully launched! 🚀');
     } else {
-        console.log('Waiting for a valid BOT_TOKEN...');
+        console.error('BOT_TOKEN is missing. Exiting process.');
+        process.exit(1);
     }
 }
 
@@ -147,5 +149,13 @@ startBot();
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+process.on('unhandledRejection', (error) => {
+    console.error('Unhandled rejection:', error);
+    process.exit(1);
+});
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught exception:', error);
+    process.exit(1);
+});
 
 module.exports = bot;

@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const paymentScene = new Scenes.BaseScene('paymentScene');
+const SUPPORT_USERNAME = 'CvSupport1';
 
 paymentScene.enter((ctx) => {
     ctx.reply('للاشتراك، يرجى اختيار أحد البنوك المتاحة حالياً:', {
@@ -24,7 +25,7 @@ paymentScene.action('BANK_STC', async (ctx) => {
             caption: 'يرجى مسح الباركود للتحويل',
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: '✔️ تم الدفع اضغط للتحقق', callback_data: 'PAYMENT_VERIFY' }]
+                    [{ text: '✔️ تم الدفع - متابعة التفعيل', callback_data: 'PAYMENT_VERIFY' }]
                 ]
             }
         });
@@ -33,7 +34,7 @@ paymentScene.action('BANK_STC', async (ctx) => {
         await ctx.reply('يرجى مسح الباركود للتحويل \n\n(ملاحظة للمشرف: لا توجد صورة stc_qr.png في المجلد)', {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: '✔️ تم الدفع اضغط للتحقق', callback_data: 'PAYMENT_VERIFY' }]
+                    [{ text: '✔️ تم الدفع - متابعة التفعيل', callback_data: 'PAYMENT_VERIFY' }]
                 ]
             }
         });
@@ -42,7 +43,7 @@ paymentScene.action('BANK_STC', async (ctx) => {
 });
 
 paymentScene.action('PAYMENT_VERIFY', (ctx) => {
-    ctx.reply('يرجى منك الضغط على زر عرض المعرف الشخصي للحصول على الكود الخاص بك:', {
+    ctx.reply(`اضغط على زر عرض المعرف الشخصي، ثم أرسله مع صورة الحوالة إلى @${SUPPORT_USERNAME} لإتمام التفعيل:`, {
         reply_markup: {
             inline_keyboard: [
                 [{ text: '👤 عرض المعرف الشخصي', callback_data: 'SHOW_ID' }]
@@ -59,7 +60,7 @@ paymentScene.action('SHOW_ID', async (ctx) => {
 (اضغط على الرقم لنسخه)
 
 بعد نسخ المعرف الشخصي، صور الحوالة وتوجه للحساب هذا ليتم التفعيل:
-@BenDakhiL
+@${SUPPORT_USERNAME}
 
 *بعد الدخول للمعرف، أرفق الصورة ومعرف ID الخاص بك للتفعيل.*
 
